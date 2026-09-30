@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>જળશક્તિ ગુજરાત — જળ સંચય અને સ્માર્ટ મોનિટરિંગ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a1628;--card:rgba(255,255,255,0.06);--blue:#00b4d8;--green:#06d6a0;--red:#ef476f;--yellow:#ffd166;--text:#e0e0e0;--white:#fff}
+body{font-family:'Segoe UI','Shruti','Nirmala UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.hero{text-align:center;padding:50px 20px 25px;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%)}
+.hero h1{font-size:2.5rem;color:var(--white);margin-bottom:8px}
+.hero h1 span{color:var(--blue)}
+.hero p{font-size:1.1rem;color:#8899aa;max-width:750px;margin:0 auto}
+.hero-msg{display:block;margin-top:14px;font-size:0.95rem;color:var(--yellow);font-weight:600;max-width:700px;margin-left:auto;margin-right:auto}
+.hero .badge{display:inline-block;margin-top:12px;padding:6px 16px;border-radius:20px;background:rgba(0,180,216,0.15);color:var(--blue);font-size:0.9rem;border:1px solid rgba(0,180,216,0.3)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.section-title{font-size:1.4rem;color:var(--white);margin:35px 0 18px;padding-left:12px;border-left:4px solid var(--blue)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:25px}
+.card{background:var(--card);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;transition:transform 0.2s}
+.card:hover{transform:translateY(-4px)}
+.card h3{color:var(--white);margin-bottom:12px;font-size:1.15rem}
+.card .stat{font-size:1.8rem;font-weight:700;margin:6px 0}
+.card .stat.blue{color:var(--blue)} .card .stat.green{color:var(--green)} .card .stat.red{color:var(--red)} .card .stat.yellow{color:var(--yellow)}
+.card .label{font-size:0.85rem;color:#8899aa}
+.chart-box{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:25px}
+.btn-group{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.btn{padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:var(--card);color:var(--text);cursor:pointer;font-size:0.9rem;transition:all 0.2s}
+.btn:hover,.btn.active{background:var(--blue);color:var(--white);border-color:var(--blue)}
+.btn.elnino{border-color:var(--red);color:var(--red)} .btn.elnino.active{background:var(--red);color:var(--white)}
+.chip{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:var(--card);color:var(--text);cursor:pointer;font-size:0.85rem;transition:all 0.2s}
+.chip:hover{background:var(--blue);color:var(--white);border-color:var(--blue)}
+.simulator{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:25px;margin-bottom:25px}
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:18px}
+.sim-grid label{display:flex;flex-direction:column;gap:6px;color:#8899aa;font-size:0.85rem}
+.sim-grid select,.sim-grid input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background-color:var(--bg);color:var(--white);font-size:1rem;font-weight:600}
+.sim-grid select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238899aa' stroke-width='2.5'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.sim-grid .hint{font-size:0.78rem;color:#667;margin-top:4px}
+.sim-result{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-top:18px}
+.sim-result .box{background:rgba(0,180,216,0.08);border-radius:12px;padding:15px;text-align:center}
+.sim-result .box .val{font-size:1.5rem;font-weight:700;color:var(--blue)}
+.sim-result .box .desc{font-size:0.8rem;color:#8899aa;margin-top:4px}
+.chat-box{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:35px}
+.toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.toggle-label{font-size:0.85rem;color:#8899aa} .toggle-label.active-label{color:var(--blue);font-weight:600}
+.switch{position:relative;width:50px;height:26px;cursor:pointer} .switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#334;border-radius:26px;transition:0.3s}
+.slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:var(--white);border-radius:50%;transition:0.3s}
+.switch input:checked+.slider{background:var(--blue)} .switch input:checked+.slider:before{transform:translateX(24px)}
+.chat-messages{height:220px;overflow-y:auto;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;margin-bottom:12px}
+.chat-messages .msg{margin-bottom:10px;padding:10px 14px;border-radius:10px;max-width:85%;font-size:0.9rem;line-height:1.5}
+.msg.user{background:rgba(0,180,216,0.15);color:var(--blue);margin-left:auto;text-align:right}
+.msg.ai{background:rgba(255,255,255,0.06);color:var(--text)}
+.chat-input-row{display:flex;gap:10px}
+.chat-input-row input{flex:1;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:var(--white);font-size:0.95rem}
+.chat-input-row button{padding:10px 20px;border-radius:8px;border:none;background:var(--blue);color:var(--white);cursor:pointer;font-size:0.95rem;font-weight:600}
+.policy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;margin-bottom:25px}
+.policy-card{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-left:4px solid var(--green);border-radius:12px;padding:16px;line-height:1.5}
+.policy-card h4{color:var(--white);margin-bottom:8px;font-size:1rem;display:flex;align-items:center;gap:8px}
+.policy-card p{color:#8899aa;font-size:0.85rem}
+footer{text-align:center;padding:25px;color:#556;font-size:0.85rem}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>💧 <span>જળશક્તિ</span> ગુજરાત</h1>
+  <p>આપણો ધ્યેય પાણીના વપરાશ પર કાપ મુકવાનો નથી, પરંતુ વેડફાઈ જતા વરસાદી પાણીનો સંગ્રહ કરવાનો છે.</p>
+  <div class="badge">📊 સ્થિતિ: ૨૮ સપ્ટેમ્બર ૨૦૨૬ | ગુજરાત સરકાર ડેટા આધારિત AI મોડેલ</div>
+  <p class="hero-msg">૨૦૨૬માં એલ નીનોને કારણે વરસાદમાં ૨૨% ઘટાડાની શક્યતા છે, જળ સંચય અનિવાર્ય છે.</p>
+</div>
+
+<div class="container">
+  <div id="loading" style="text-align:center;padding:40px;color:#8899aa">⏳ ડેટા લોડ થાય છે…</div>
+  <h2 class="section-title">વિસ્તાર મુજબ વાર્ષિક સ્થિતિ</h2>
+  <div class="cards" id="zoneCards"></div>
+
+  <h2 class="section-title">માસિક વરસાદ વિરુદ્ધ વેડફાતું પાણી (ચોમાસું ૨૦૨૬)</h2>
+  <div class="btn-group">
+    <button class="btn active" aria-label="શુષ્ક વિસ્તાર (કચ્છ/ઉત્તર) પસંદ કરો" onclick="setZone('Arid',this)">શુષ્ક (કચ્છ/ઉત્તર)</button>
+    <button class="btn" aria-label="અર્ધ-શુષ્ક વિસ્તાર (મધ્ય/સૌરાષ્ટ્ર) પસંદ કરો" onclick="setZone('Semi-Arid',this)">અર્ધ-શુષ્ક (મધ્ય/સૌરાષ્ટ્ર)</button>
+    <button class="btn" aria-label="દરિયાકાંઠો વિસ્તાર (દક્ષિણ) પસંદ કરો" onclick="setZone('Coastal',this)">દરિયાકાંઠો (દક્ષિણ)</button>
+    <button class="btn elnino" id="elninoBtn" aria-label="એલ નીનો ૨૦૨૬ અસર ટોગલ કરો" onclick="toggleElnino(this)">🌡️ એલ નીનો ૨૦૨૬ અસર</button>
+  </div>
+  <div class="chart-box"><canvas id="mainChart" aria-label="માસિક વરસાદ, બગાડ અને સંચય ક્ષમતાનો સ્ટેક્ડ બાર ચાર્ટ"></canvas></div>
+
+  <h2 class="section-title">ભૂગર્ભ જળસ્તર સ્થિતિ (મીટરમાં ઊંડાઈ)</h2>
+  <div class="chart-box"><canvas id="gwlChart"></canvas></div>
+
+  <h2 class="section-title">વાર્ષિક ભૂગર્ભ જળસ્તરની ચલણી (૨૦૨૨–૨૦૫)</h2>
+  <div class="chart-box"><canvas id="trendChart" aria-label="૨૦૨૨ થી ૨૦૫ સુધી ભૂગર્ભ જળસ્તરની ઊંડાઈનો ટ્રેન્ડ"></canvas></div>
+
+  <h2 class="section-title">વરસાદી પાણી સંચય કેલ્ક્યુલેટર</h2>
+  <div class="simulator">
+    <div class="sim-grid">
+      <label>વિસ્તાર પસંદ કરો
+        <select id="simZone"><option value="Arid">🏜️ શુષ્ક (Arid)</option><option value="Semi-Arid" selected>🌾 અર્ધ-શુષ્ક (Semi-Arid)</option><option value="Coastal">🌊 દરિયાકાંઠો (Coastal)</option></select>
+        <span class="hint">જે વિસ્તારનો વરસાદ તમે જોવા માંગો છો</span>
+      </label>
+      <label>પરિવારના સભ્યોની સંખ્યા
+        <input type="number" id="simFamily" value="4" min="2" max="8">
+      </label>
+      <label>મહિનો
+        <select id="simMonth">
+          <option value="1">1 — જાન્યુઆરી</option><option value="2">2 — ફેબ્રુઆરી</option><option value="3">3 — માર્ચ</option>
+          <option value="4">4 — એપ્રિલ</option><option value="5">5 — મે</option><option value="6">6 — જૂન</option>
+          <option value="7" selected>7 — જુલાઈ</option><option value="8">8 — ઓગસ્ટ</option><option value="9">9 — સપ્ટેમ્બર</option>
+          <option value="10">10 — ઓક્ટોબર</option><option value="11">11 — નવેમ્બર</option><option value="12">12 — ડિસેમ્બર</option>
+        </select>
+        <span class="hint">એ મહિનાના વરસાદના આધારે સંચયની ગણના થાય છે</span>
+      </label>
+    </div>
+    <button class="btn" onclick="runSimulator()" style="background:var(--green);color:#000;font-weight:700">સંચય ક્ષમતા ગણો</button>
+    <div class="sim-example" style="margin-top:18px;background:rgba(0,180,216,0.08);border-radius:12px;padding:14px 16px;font-size:0.9rem;line-height:1.6">
+      <strong style="color:var(--blue)">🏠 ઉદાહરણ:</strong> ૧૦૦ ચો.મી.ની છત પરથી વર્ષે આશરે <strong style="color:var(--green)">૮૦,૦૦૦ લીટર</strong> પાણી બચાવી શકાય — આ પરિવારના ૪ સભ્યો માટે લગભग ૫ મહિનાનું પીવાનું પાણી.
+    </div>
+    <div class="sim-result" id="simResult"></div>
+  </div>
+
+  <h2 class="section-title">સ્થાનિક સ્વરાજ્ય અને સરકાર માટે સૂચનો</h2>
+  <div class="policy-grid">
+    <div class="policy-card"><h4>🏜️ શુષ્ક ક્ષેત્ર (કચ્છ)</h4><p>એલ નીનો ૨૦૨૬ પછીના સમય માટે તળાવો ઊંડા કરવા અને બોરવેલ રિચાર્જ શાફ્ટ બનાવવા.</p></div>
+    <div class="policy-card"><h4>🌾 અર્ધ-શુષ્ક ક્ષેત્ર</h4><p>પ્રાચીન વાવ અને તળાવોનું પુનરુત્થાન કરી ભૂગર્ભ જળસ્તર ઊંચું લાવવું.</p></div>
+    <div class="policy-card"><h4>🌊 દરિયાકાંઠો (દક્ષિણ)</h4><p>૧૦૦ ચો.મી.થી મોટા તમામ મકાનોમાં રેન વોટર હાર્વેસ્ટિંગ સિસ્ટમ ફરજિયાત કરવી.</p></div>
+    <div class="policy-card"><h4>🏛️ સરકારી નીતિ</h4><p>ચોમાસાના વધારાના પાણીને કેનાલ મારફતે પાણીની અછતવાળા વિસ્તારો તરફ વાળવું.</p></div>
+  </div>
+
+  <h2 class="section-title">AI જળ સલાહકાર</h2>
+  <div class="chat-box">
+    <div class="toggle-row">
+      <span class="toggle-label active-label" id="lblStandard">સામાન્ય મોડેલ</span>
+      <label class="switch">
+        <input type="checkbox" id="modeToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label" id="lblDeep">ઊંડાણપૂર્વક વિશ્લેષણ (AI)</span>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg ai">નમસ્તે! હું જળશક્તિ AI સલાહકાર છું. તમે મને ગુજરાતના જળ સંચય, વિસ્તારો અથવા નીતિઓ વિશે ગુજરાતીમાં પૂછી શકો છો.</div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="પ્રશ્ન પૂછો (દા.ત. કચ્છ માટે શું ઉપાય છે?)..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button aria-label="મોકલો" onclick="sendChat()">મોકલો</button>
+    </div>
+    <div class="chat-chips" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="chip" aria-label="કચ્છ માટે શું ઉપાય છે? પૂછો" onclick="sendChip('કચ્છ માટે શું ઉપાય છે?')">કચ્છ</button>
+      <button class="chip" aria-label="દરિયાકાંઠો વિસ્તારનું પાણી વિશે પૂછો" onclick="sendChip('દરિયાકાંઠો વિસ્તારનું પાણી')">દરિયાકાંઠો</button>
+      <button class="chip" aria-label="એલ નીનો ૨૦૨૬નો અસર વિશે પૂછો" onclick="sendChip('એલ નીનો ૨૦૨૬નો અસર')">એલ નીનો</button>
+      <button class="chip" aria-label="પાણી બચાવવાના ઉપાયો વિશે પૂછો" onclick="sendChip('પાણી બચાવવાના ઉપાયો')">બચાવવાના ઉપાયો</button>
+    </div>
+  </div>
+</div>
+
+<footer>જળશક્તિ ગુજરાત © ૨૦૨૬ | ડેટા સ્ત્રોત: GWRDC | છેલ્લું અપડેટ: ૨૮-૦૯-૨૦૨૬ | નોંધ: આગાહીઓ મોડેલ આધારિત છે.</footer>
+
+<script>
+let DATA = {};
+let DATA_TREND = null;
+let currentZone = 'Arid';
+let elninoMode = false;
+let mainChart, gwlChart, trendChart;
+
+fetch('/api/summary')
+  .then(r => r.json())
+  .then(d => { DATA = d; renderAll(); })
+  .catch(() => { fetch('/summary_stats.json').then(r => r.json()).then(d => { DATA = d; renderAll(); }); });
+
+fetch('/trend.json').then(r => r.json()).then(t => { DATA_TREND = t; renderTrendChart(); })
+  .catch(() => {});
+
+function renderAll() { document.getElementById('loading').style.display = 'none'; renderZoneCards(); renderMainChart(); renderGWLChart(); }
+
+function renderZoneCards() {
+  const c = document.getElementById('zoneCards');
+  c.innerHTML = '';
+  const zoneNames = { 'Arid': 'શુષ્ક ક્ષેત્ર (કચ્છ)', 'Semi-Arid': 'અર્ધ-શુષ્ક (મધ્ય/ઉત્તર)', 'Coastal': 'દરિયાકાંઠો (દક્ષિણ)' };
+  for (const z of ['Arid', 'Semi-Arid', 'Coastal']) {
+    const d = DATA[z]?.historical_monthly;
+    if (!d) continue;
+    const months = Object.values(d);
+    const totalRain = months.reduce((s, m) => s + (m.rainfall_mm || 0), 0);
+    const totalLoss = months.reduce((s, m) => s + (m.water_lost_liters || 0), 0);
+    const totalHarvest = months.reduce((s, m) => s + (m.harvestable_liters || 0), 0);
+    const avgGWL = Math.abs(months.reduce((s, m) => s + (m.avg_gwl_m || 0), 0) / months.length).toFixed(1);
+    const color = z === 'Arid' ? 'red' : z === 'Coastal' ? 'green' : 'yellow';
+    const flatRain = new Set(months.map(m => m.rainfall_mm)).size === 1;
+    const explain = z === 'Arid'
+      ? 'કચ્છમાં વરસાદ ઓછો પડે છે, તેથી સંચય કરેલા પાણી અહીં મુખ્ય આધાર બનશે.'
+      : z === 'Coastal'
+      ? 'દરિયાકાંઠામાં ભારે વરસાદ હોય છતાં પાણી જમીન તરી વહી જાય છે; છત પરથી બચાવવું જોઈએ.'
+      : 'મધ્ય ગુજરાતમાં વરસાદ અધું પડે છે, પણ ભૂગર્ભ જળસ્તર ઊંચા રાખવાનો પ્રયાસ કરવો.';
+    c.innerHTML += `<div class="card">
+      <h3>${z === 'Arid' ? '🏜️' : z === 'Coastal' ? '🌊' : '🌾'} ${zoneNames[z]}</h3>
+      <div class="stat ${color}">${(totalRain).toFixed(0)} mm</div>
+      <div class="label">સરેરાશ વાર્ષિક વરસાદ — પ્રતિ વર્ષે મેલવાયેલા વરસાદનો કુલ</div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px"><div class="stat green" style="font-size:1.1rem">${(totalHarvest/1000).toFixed(0)} હજાર લીટર</div><div class="label">સંચય ક્ષમતા</div><div class="label" style="margin-top:2px">છત પરથી એકત્ર કરી શકાય તેવું પાણી</div></div>
+        <div style="flex:1;min-width:120px"><div class="stat red" style="font-size:1.1rem">${(totalLoss/1000).toFixed(0)} હજાર લીટર</div><div class="label">અંદાજ બગાડ</div><div class="label" style="margin-top:2px">વરસાદી પાણીનો ભાગ વહી જાય છે</div></div>
+        <div style="flex:1;min-width:120px"><div class="stat blue" style="font-size:1.1rem">${avgGWL} મીટર</div><div class="label">ભૂગર્ભ જળસ્તર (ઊંડાઈ)</div><div class="label" style="margin-top:2px">ભૂમિના પાતાળની ઊંડાઈ</div></div>
+      </div>
+      <div class="label" style="margin-top:10px;color:#8899aa">${explain}</div>
+    </div>`;
+  }
+}
+
+function renderMainChart() {
+  const d = elninoMode ? DATA[currentZone]?.elnino_2026_monthly : DATA[currentZone]?.historical_monthly;
+  if (!d) return;
+  const labels = ['જાન્યુ','ફેબ્રુ','માર્ચ','એપ્રિલ','મે','જૂન','જુલાઈ','ઓગસ્ટ','સપ્ટે','ઓક્ટો','નવે','ડિસે'];
+  const rain = [], loss = [], harvest = [];
+  for (let m = 1; m <= 12; m++) {
+    const v = d[m] || d[String(m)] || {};
+    rain.push(v.rainfall_mm || 0);
+    loss.push((v.water_lost_liters || 0) / 1000);
+    harvest.push((v.harvestable_liters || 0) / 1000);
+  }
+  const box = document.getElementById('mainChart').parentNode;
+  let gapEl = box.querySelector('.data-gap');
+  if (currentZone === 'Coastal' && !elninoMode) {
+    const flat = new Set(Object.values(d).map(v => v.rainfall_mm)).size === 1;
+    if (flat) {
+      if (!gapEl) {
+        gapEl = document.createElement('div');
+        gapEl.className = 'data-gap';
+        gapEl.style.cssText = 'background:rgba(0,180,216,0.08);border:1px solid rgba(0,180,216,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;color:var(--blue);font-size:0.85rem';
+        box.insertBefore(gapEl, box.firstChild);
+      }
+      gapEl.textContent = 'નોંધ: દરિયાકાંઠાના માસિક વરસાદનો ડેટા ઉપલબ્ધ નથી, તેથી બધા મહિનાઓમાં ૫ મીમી દાખલ છે. તેને ખરેખર તકેલાવવાનો અભાવ છે.';
+    }
+  } else if (gapEl) {
+    gapEl.remove();
+  }
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (mainChart) mainChart.destroy();
+  mainChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'વરસાદ (મિમી)', data: rain, backgroundColor: 'rgba(0,180,216,0.6)', borderRadius: 5 },
+        { label: 'અંદાજ બગાડ (હજાર લીટર)', data: loss, backgroundColor: 'rgba(239,71,111,0.5)', borderRadius: 5 },
+        { label: 'સંચય ક્ષમતા (હજાર લીટર)', data: harvest, backgroundColor: 'rgba(6,214,160,0.5)', borderRadius: 5 }
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { labels: { color: '#aaa' } } }, scales: { x: { ticks: { color: '#888' } }, y: { ticks: { color: '#888' } } } }
+  });
+}
+
+function renderGWLChart() {
+  const labels = ['જાન્યુ','ફેબ્રુ','માર્ચ','એપ્રિલ','મે','જૂન','જુલાઈ','ઓગસ્ટ','સપ્ટે','ઓક્ટો','નવે','ડિસે'];
+  const zoneNames = { 'Arid': 'શુષ્ક', 'Semi-Arid': 'અર્ધ-શુષ્ક', 'Coastal': 'દરિયાકાંઠો' };
+  const hist = DATA[currentZone]?.historical_monthly;
+  const eln = DATA[currentZone]?.elnino_2026_monthly;
+  const datasets = [];
+  if (hist) {
+    const vals = [];
+    for (let m = 1; m <= 12; m++) { const v = hist[m] || hist[String(m)] || {}; vals.push(Math.abs(v.avg_gwl_m || 0)); }
+    datasets.push({ label: 'સામાન્ય સ્થિતિ (ભૂતકાલ)', data: vals, borderColor: '#06d6a0', backgroundColor: 'transparent', tension: 0.4, pointRadius: 4, borderWidth: 2 });
+  }
+  if (eln) {
+    const vals = [];
+    for (let m = 1; m <= 12; m++) { const v = eln[m] || eln[String(m)] || {}; vals.push(Math.abs(v.avg_gwl_m || 0)); }
+    datasets.push({ label: 'એલ નીનો ૨૦૨૬', data: vals, borderColor: '#ef476f', backgroundColor: 'rgba(239,71,111,0.12)', tension: 0.4, pointRadius: 4, borderWidth: 2, fill: true, borderDash: [6, 4] });
+  }
+  const ctx = document.getElementById('gwlChart').getContext('2d');
+  if (gwlChart) gwlChart.destroy();
+  gwlChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: { responsive: true, plugins: { legend: { labels: { color: '#aaa' } } }, scales: { x: { ticks: { color: '#888' } }, y: { ticks: { color: '#888' }, title: { display: true, text: 'જળસ્તર ઊંડાઈ (મીટર)', color: '#888' } } } }
+  });
+}
+
+function renderTrendChart() {
+  // ponytail: trend.json has 4 years × 3 zones; only gwls_mean varies year-to-year
+  // (rainfall/harvest/lost are flat synthetic values). Plot GWL only, say so in the label.
+  const t = DATA_TREND;
+  if (!t) return;
+  const years = t.years;
+  const datasets = ['Arid', 'Semi-Arid', 'Coastal'].map(z => {
+    const vals = years.map(y => Math.abs(t.zones[z][String(y)].gwls_mean || 0));
+    const color = z === 'Arid' ? '#ef476f' : z === 'Coastal' ? '#06d6a0' : '#ffd166';
+    return { label: z, data: vals, borderColor: color, backgroundColor: color + '22', tension: 0.4, pointRadius: 5, fill: true, borderWidth: 2 };
+  });
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: years, datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#aaa' } },
+        title: { display: true, text: 'પાણીનો અભાવ અને વરસાદ બે અલગ અલગ વિશ્લેષણ છે', color: '#888', font: { size: 11 } }
+      },
+      scales: {
+        x: { ticks: { color: '#888' } },
+        y: { ticks: { color: '#888' }, title: { display: true, text: 'જળસ્તર ઊંડાઈ (મીટર)', color: '#888' } }
+      }
+    }
+  });
+}
+
+function setZone(z, btn) { currentZone = z; document.querySelectorAll('.btn-group .btn:not(.elnino)').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderMainChart(); }
+function toggleElnino(btn) { elninoMode = !elninoMode; btn.classList.toggle('active'); renderMainChart(); renderGWLChart(); }
+
+function runSimulator() {
+  const zone = document.getElementById('simZone').value;
+  const family = document.getElementById('simFamily').value;
+  const month = document.getElementById('simMonth').value;
+  fetch(`/api/predict?zone=${zone}&family_size=${family}&month=${month}`)
+    .then(r => r.json())
+    .then(d => {
+      const days = Math.round(d.months_drinking_water * 30);
+      const summaryMsg = `આ મહિનામાં <strong>${d.harvestable_liters.toLocaleString()} લીટર</strong> પાણી એકત્ર કરી શકાય — તમારા ${family} સભ્યોના પરિવાર માટે લગભગ <strong>${d.months_drinking_water} મહિના (${days} દિવસ)</strong> નું પીવાનું પાણી!`;
+      document.getElementById('simResult').innerHTML = `
+        <div style="grid-column:1/-1;background:rgba(6,214,160,0.12);border:1px solid rgba(6,214,160,0.3);border-radius:12px;padding:12px 16px;color:var(--white);font-size:0.95rem;line-height:1.5">
+          ${summaryMsg}
+        </div>
+        <div class="box">
+          <div class="val">${d.harvestable_liters.toLocaleString()} લીટર</div>
+          <div class="desc" style="font-weight:600;color:var(--white)">એકત્ર કરી શકાય તેવું પાણી</div>
+          <div class="desc">છત પરથી આ મહિનાના વરસાદમાં સંચય થતું પાણી</div>
+        </div>
+        <div class="box">
+          <div class="val" style="color:var(--red)">${d.water_lost_liters.toLocaleString()} લીટર</div>
+          <div class="desc" style="font-weight:600;color:var(--white)">વહીને વેડફાઈ જતું પાણી (અંદાજ)</div>
+          <div class="desc">સંચય ન કરવામાં આવે તો જમીન પર વહી જાય છે</div>
+        </div>
+        <div class="box">
+          <div class="val" style="color:var(--green)">${d.months_drinking_water} મહિના</div>
+          <div class="desc" style="font-weight:600;color:var(--white)">પરિવાર માટે પીવાનું પાણી</div>
+          <div class="desc">${family} સભ્યો માટે આશરે ${days} દિવસનું પીવાનું પાણી</div>
+        </div>
+      `;
+    });
+}
+
+document.getElementById('modeToggle').addEventListener('change', function() {
+  document.getElementById('lblStandard').classList.toggle('active-label', !this.checked);
+  document.getElementById('lblDeep').classList.toggle('active-label', this.checked);
+});
+
+function sendChip(text) {
+  document.getElementById('chatInput').value = text;
+  sendChat();
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const box = document.getElementById('chatMessages');
+  box.innerHTML += `<div class="msg user">${msg}</div>`;
+  input.value = '';
+  const mode = document.getElementById('modeToggle').checked ? 'deep' : 'standard';
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ message: msg, mode })
+  })
+  .then(r => r.json())
+  .then(d => { box.innerHTML += `<div class="msg ai">${d.reply}</div>`; box.scrollTop = box.scrollHeight; })
+  .catch(() => { box.innerHTML += `<div class="msg ai">કચ્છ, દક્ષિણ ગુજરાત, પાણી બચાવવાના ઉપાયો કે એલ નીનો વિશે પૂછો.</div>`; box.scrollTop = box.scrollHeight; });
+}
+</script>
+</body>/body>
+</html>
