@@ -1,0 +1,452 @@
+{
+  "Arid": {
+    "historical_monthly": {
+      "1": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -52.2225
+      },
+      "2": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -49.4975
+      },
+      "3": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -51.7125
+      },
+      "4": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -50.31
+      },
+      "5": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -35.85
+      },
+      "6": {
+        "rainfall_mm": 41.375,
+        "harvestable_liters": 4329.140690376569,
+        "water_lost_liters": 3351.999476987448,
+        "avg_gwl_m": -49.987500000000004
+      },
+      "7": {
+        "rainfall_mm": 95.375,
+        "harvestable_liters": 9979.257845188284,
+        "water_lost_liters": 8954.833158995816,
+        "avg_gwl_m": -46.68
+      },
+      "8": {
+        "rainfall_mm": 58.25,
+        "harvestable_liters": 6094.80230125523,
+        "water_lost_liters": 5070.929916317991,
+        "avg_gwl_m": -40.94
+      },
+      "9": {
+        "rainfall_mm": 76.5,
+        "harvestable_liters": 8004.332635983264,
+        "water_lost_liters": 6979.907949790795,
+        "avg_gwl_m": -45.3375
+      },
+      "10": {
+        "rainfall_mm": 39.5,
+        "harvestable_liters": 4132.956066945607,
+        "water_lost_liters": 3174.979079497908,
+        "avg_gwl_m": -64.255
+      },
+      "11": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -49.955
+      },
+      "12": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 523.1589958158996,
+        "water_lost_liters": 391.5690376569038,
+        "avg_gwl_m": -51.27
+      }
+    },
+    "elnino_2026_monthly": {
+      "1": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -53.42
+      },
+      "2": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -50.7
+      },
+      "3": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -52.91
+      },
+      "4": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -51.51
+      },
+      "5": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -37.05
+      },
+      "6": {
+        "rainfall_mm": 32.3,
+        "harvestable_liters": 3376.7,
+        "water_lost_liters": 2614.6,
+        "avg_gwl_m": -51.19
+      },
+      "7": {
+        "rainfall_mm": 74.4,
+        "harvestable_liters": 7783.8,
+        "water_lost_liters": 6984.8,
+        "avg_gwl_m": -47.88
+      },
+      "8": {
+        "rainfall_mm": 45.4,
+        "harvestable_liters": 4753.9,
+        "water_lost_liters": 3955.3,
+        "avg_gwl_m": -42.14
+      },
+      "9": {
+        "rainfall_mm": 59.7,
+        "harvestable_liters": 6243.4,
+        "water_lost_liters": 5444.3,
+        "avg_gwl_m": -46.54
+      },
+      "10": {
+        "rainfall_mm": 39.5,
+        "harvestable_liters": 3223.7,
+        "water_lost_liters": 2476.5,
+        "avg_gwl_m": -65.45
+      },
+      "11": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -51.16
+      },
+      "12": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 408.1,
+        "water_lost_liters": 305.4,
+        "avg_gwl_m": -52.47
+      }
+    }
+  },
+  "Semi-Arid": {
+    "historical_monthly": {
+      "1": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -31.532500000000002
+      },
+      "2": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -30.8375
+      },
+      "3": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -31.634999999999998
+      },
+      "4": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -29.185
+      },
+      "5": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -29.134999999999998
+      },
+      "6": {
+        "rainfall_mm": 23.395,
+        "harvestable_liters": 2433.166176470588,
+        "water_lost_liters": 1900.632492997199,
+        "avg_gwl_m": -28.2525
+      },
+      "7": {
+        "rainfall_mm": 155.495,
+        "harvestable_liters": 16171.481582633052,
+        "water_lost_liters": 15256.292507002801,
+        "avg_gwl_m": -25.745
+      },
+      "8": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -23.2
+      },
+      "9": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -25.0625
+      },
+      "10": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -21.740000000000002
+      },
+      "11": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -21.8675
+      },
+      "12": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 520.0,
+        "water_lost_liters": 406.1904761904762,
+        "avg_gwl_m": -21.6225
+      }
+    },
+    "elnino_2026_monthly": {
+      "1": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -32.73
+      },
+      "2": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -32.04
+      },
+      "3": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -32.84
+      },
+      "4": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -30.38
+      },
+      "5": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -30.33
+      },
+      "6": {
+        "rainfall_mm": 18.2,
+        "harvestable_liters": 1897.9,
+        "water_lost_liters": 1482.5,
+        "avg_gwl_m": -29.45
+      },
+      "7": {
+        "rainfall_mm": 121.3,
+        "harvestable_liters": 12613.8,
+        "water_lost_liters": 11899.9,
+        "avg_gwl_m": -26.95
+      },
+      "8": {
+        "rainfall_mm": 3.9,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -24.4
+      },
+      "9": {
+        "rainfall_mm": 3.9,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -26.26
+      },
+      "10": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -22.94
+      },
+      "11": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -23.07
+      },
+      "12": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 405.6,
+        "water_lost_liters": 316.8,
+        "avg_gwl_m": -22.82
+      }
+    }
+  },
+  "Coastal": {
+    "historical_monthly": {
+      "1": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -39.192499999999995
+      },
+      "2": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -9.92
+      },
+      "3": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -36.6825
+      },
+      "4": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -37.357499999999995
+      },
+      "5": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -10.2175
+      },
+      "6": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -96.58
+      },
+      "7": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -7.3950000000000005
+      },
+      "8": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -82.2375
+      },
+      "9": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -22.985
+      },
+      "10": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -19.235
+      },
+      "11": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -36.817499999999995
+      },
+      "12": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 519.1666666666666,
+        "water_lost_liters": 380.8333333333333,
+        "avg_gwl_m": -6.46
+      }
+    },
+    "elnino_2026_monthly": {
+      "1": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -40.39
+      },
+      "2": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -11.12
+      },
+      "3": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -37.88
+      },
+      "4": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -38.56
+      },
+      "5": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -11.42
+      },
+      "6": {
+        "rainfall_mm": 3.9,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -97.78
+      },
+      "7": {
+        "rainfall_mm": 3.9,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -8.6
+      },
+      "8": {
+        "rainfall_mm": 3.9,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -83.44
+      },
+      "9": {
+        "rainfall_mm": 3.9,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -24.18
+      },
+      "10": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -20.43
+      },
+      "11": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -38.02
+      },
+      "12": {
+        "rainfall_mm": 5.0,
+        "harvestable_liters": 404.9,
+        "water_lost_liters": 297.1,
+        "avg_gwl_m": -7.66
+      }
+    }
+  }
+}
