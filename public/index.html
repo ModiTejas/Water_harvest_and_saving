@@ -447,10 +447,12 @@ function renderZoneCards() {
       totalRain = Math.round(totalRain * ratio);
     }
 
-    if (elninoMode) totalRain = Math.round(totalRain * 0.78);
+    if (elninoMode && !yearInfo) totalRain = Math.round(totalRain * 0.78);
 
     const totalRainVol = totalRain * ROOF_M2;
-    let totalHarvest = Math.min(totalRainVol * 0.85, totalRainVol * 0.80) * scale;
+    const roofCoefficient = 0.85; // 190 m² reference roof: concrete/RCC
+    const collectionEfficiency = 0.90;
+    let totalHarvest = totalRainVol * roofCoefficient * collectionEfficiency * scale;
     let totalLoss = Math.max(0, (totalRainVol * scale) - totalHarvest);
 
     const avgGWL = yearInfo ? Math.abs(yearInfo.gwls_mean).toFixed(1) : Math.abs(Object.values(monthly).reduce((s, m) => s + (m.avg_gwl_m || 0), 0) / 12).toFixed(1);
@@ -489,10 +491,12 @@ function renderZoneCards() {
     const yearInfo = getYearRainAndGWL(z, selectedYear);
 
     let totalRain = yearInfo ? yearInfo.annual_rain_mm : ZONE_DEFAULTS[z].rain;
-    if (elninoMode) totalRain = Math.round(totalRain * 0.78);
+    if (elninoMode && !yearInfo) totalRain = Math.round(totalRain * 0.78);
 
     const totalRainVol = totalRain * ROOF_M2;
-    let totalHarvest = Math.min(totalRainVol * 0.85, totalRainVol * 0.80) * scale;
+    const roofCoefficient = 0.85; // 190 m² reference roof: concrete/RCC
+    const collectionEfficiency = 0.90;
+    let totalHarvest = totalRainVol * roofCoefficient * collectionEfficiency * scale;
     let totalLoss = Math.max(0, (totalRainVol * scale) - totalHarvest);
 
     const avgGWL = yearInfo ? Math.abs(yearInfo.gwls_mean).toFixed(1) : Math.abs(ZONE_DEFAULTS[z].gwl).toFixed(1);
