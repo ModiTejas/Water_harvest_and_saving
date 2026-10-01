@@ -25,17 +25,16 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 model_harvest = joblib.load(os.path.join(BASE, "harvest_model.pkl"))
 
 # Load Summary Statistics
-summary_path = os.path.join(PUBLIC_DIR, "summary_stats.json")
+SUMMARY_PATH = BASE / "summary_stats.json"
 
-if not os.path.exists(summary_path):
-    raise FileNotFoundError(f"summary_stats.json not found at: {summary_path}")
-
-with open(summary_path, "r", encoding="utf-8") as f:
+with open(SUMMARY_PATH, "r", encoding="utf-8") as f:
     summary = json.load(f)
 
 # Load District Dataset
-districts_path = os.path.join(PUBLIC_DIR, "districts.json")
-districts_data = json.load(open(districts_path, "r", encoding="utf-8")) if os.path.exists(districts_path) else {"monsoon_distribution": {}, "districts": []}
+DISTRICTS_PATH = BASE / "districts.json"
+
+with open(DISTRICTS_PATH, "r", encoding="utf-8") as f:
+    districts_data = json.load(f)
 
 ZONE_MAP = {"arid": "Arid", "semi-arid": "Semi-Arid", "coastal": "Coastal"}
 
