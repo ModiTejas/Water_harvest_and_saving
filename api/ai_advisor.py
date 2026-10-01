@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any
 
 from dotenv import load_dotenv
 
@@ -13,8 +12,6 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# Load .env locally if available.
-# On Vercel, GEMINI_API_KEY should come from Environment Variables.
 load_dotenv(BASE_DIR / ".env")
 load_dotenv(BASE_DIR.parent / ".env")
 
@@ -28,58 +25,46 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 try:
     from google import genai
     from google.genai import types
-except ImportError as e:
-    print(f"Gemini SDK import failed: {type(e).__name__}: {e}")
+except Exception as e:
+    print(f"[AI] SDK import error: {type(e).__name__}: {e}")
     genai = None
     types = None
 
 
 client = None
 
-if not GEMINI_API_KEY:
-    print("GEMINI_API_KEY is not configured.")
-
-elif genai is None:
-    print("Gemini SDK is not available.")
-
-else:
+if GEMINI_API_KEY and genai is not None:
     try:
         client = genai.Client(
             api_key=GEMINI_API_KEY
         )
-
-        print("Gemini client initialized successfully.")
-
+        print("[AI] Gemini client initialized.")
     except Exception as e:
         print(
-            "Gemini client initialization failed: "
+            f"[AI] Gemini client error: "
             f"{type(e).__name__}: {e}"
         )
         client = None
+else:
+    if not GEMINI_API_KEY:
+        print("[AI] GEMINI_API_KEY is missing.")
+
+    if genai is None:
+        print("[AI] Gemini SDK is unavailable.")
 
 
 # ============================================================
-# MODEL FALLBACKS
+# MODEL
 # ============================================================
 
-# Try the preferred model first.
-# Older models are kept only as fallbacks.
-MODEL_FALLBACKS = [
-    "gemini-3.8-flash",
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-]
-
-
-_LAST_WORKING_MODEL: str | None = None
+MODEL_NAME = "gemini-3.8-flash"
 
 
 # ============================================================
-# STANDARD OFFLINE RESPONSES
+# OFFLINE RESPONSES
 # ============================================================
 
 STANDARD_RESPONSES = {
-
     "કચ્છ": (
         "કચ્છ જેવા શુષ્ક વિસ્તારમાં વરસાદી પાણીનો સંગ્રહ, "
         "છત પરથી રેઇનવોટર હાર્વેસ્ટિંગ અને ભૂગર્ભજળ રિચાર્જ "
@@ -146,26 +131,7 @@ SYSTEM_INSTRUCTION = """
 # HELPERS
 # ============================================================
 
-def _standard_response(message: str) -> str | None:
-    """
-    Return a predefined Gujarati response when the
-    question matches one of the offline keywords.
-    """
-
-    text = message.lower()
-
-    for keyword, response in STANDARD_RESPONSES.items():
-
-        if keyword.lower() in text:
-            return response
-
-    return None
-
-
 def _is_greeting(message: str) -> bool:
-    """
-    Detect common greetings.
-    """
 
     greetings = (
         "નમસ્તે",
@@ -185,107 +151,20 @@ def _is_greeting(message: str) -> bool:
     )
 
 
-def _get_models_to_try() -> list[str]:
-    """
-    Build a model list from:
+def _standard_response(message: str) -> str | None:
 
-    1. Last successful model
-    2. Preferred fallback models
-    3. Models currently exposed by the Gemini API
+    text = message.lower()
 
-    This allows the application to continue working if a
-    particular model is unavailable to the API project.
-    """
+    for keyword, response in STANDARD_RESPONSES.items():
 
-    models: list[str] = []
+        if keyword.lower() in text:
+            return response
 
-    def add(model_name: str):
-        if not model_name:
-            return
-
-        if model_name not in models:
-            models.append(model_name)
-
-    # Last successful model first.
-    if _LAST_WORKING_MODEL:
-        add(_LAST_WORKING_MODEL)
-
-    # Preferred fallback models.
-    for model_name in MODEL_FALLBACKS:
-        add(model_name)
-
-    # Discover currently available Gemini models.
-    if client is not None:
-
-        try:
-
-            for model in client.models.list():
-
-                name = getattr(
-                    model,
-                    "name",
-                    None,
-                )
-
-                if not name:
-                    continue
-
-                clean_name = str(name)
-
-                if clean_name.startswith("models/"):
-                    clean_name = clean_name[
-                        len("models/"):
-                    ]
-
-                lowered = clean_name.lower()
-
-                # Only consider Gemini text/generative models.
-                if (
-                    "gemini" in lowered
-                    and "embedding" not in lowered
-                    and "image" not in lowered
-                    and "veo" not in lowered
-                ):
-                    add(clean_name)
-
-        except Exception as e:
-
-            print(
-                "Gemini model discovery failed: "
-                f"{type(e).__name__}: {e}"
-            )
-
-    return models
-
-
-def _extract_text(response: Any) -> str:
-    """
-    Safely extract generated text from a Gemini response.
-    """
-
-    try:
-
-        text = getattr(
-            response,
-            "text",
-            None,
-        )
-
-        if text:
-            return str(text).strip()
-
-    except Exception as e:
-
-        print(
-            "Gemini response text extraction failed: "
-            f"{type(e).__name__}: {e}"
-        )
-
-    return ""
+    return None
 
 
 # ============================================================
-# PUBLIC REPLY FUNCTION
+# PUBLIC REPLY
 # ============================================================
 
 def reply(
@@ -293,23 +172,18 @@ def reply(
     mode: str = "standard",
 ) -> str:
 
-    global _LAST_WORKING_MODEL
-
     message = str(message or "").strip()
-
-    # --------------------------------------------------------
-    # Empty message
-    # --------------------------------------------------------
 
     if not message:
         return "કૃપા કરીને તમારો પ્રશ્ન લખો."
 
     mode = str(
         mode or "standard"
-    ).lower().strip()
+    ).strip().lower()
+
 
     # --------------------------------------------------------
-    # Greeting
+    # GREETING
     # --------------------------------------------------------
 
     if _is_greeting(message):
@@ -320,8 +194,9 @@ def reply(
             "ગુજરાતના કોઈ વિસ્તાર વિશે તમારો પ્રશ્ન પૂછો."
         )
 
+
     # --------------------------------------------------------
-    # Standard / Offline Mode
+    # STANDARD MODE
     # --------------------------------------------------------
 
     if mode != "deep":
@@ -338,30 +213,87 @@ def reply(
             "'ઊંડાણપૂર્વક (AI)' મોડ પસંદ કરો."
         )
 
+
     # --------------------------------------------------------
-    # Deep AI Mode — API Key / Client Check
+    # DEEP MODE — API KEY CHECK
     # --------------------------------------------------------
 
     if not GEMINI_API_KEY:
 
-        print(
-            "Deep AI requested, but GEMINI_API_KEY is missing."
-        )
-
-        standard = _standard_response(message)
-
-        if standard:
-            return standard
+        print("[AI] ERROR: GEMINI_API_KEY is empty.")
 
         return (
             "હાલમાં AI સેવા ઉપલબ્ધ નથી. "
             "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
         )
+
+
+    # --------------------------------------------------------
+    # DEEP MODE — CLIENT CHECK
+    # --------------------------------------------------------
 
     if client is None:
 
+        print("[AI] ERROR: Gemini client is None.")
+
+        return (
+            "હાલમાં AI સેવા ઉપલબ્ધ નથી. "
+            "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
+        )
+
+
+    # --------------------------------------------------------
+    # GEMINI REQUEST
+    # --------------------------------------------------------
+
+    try:
+
         print(
-            "Deep AI requested, but Gemini client is unavailable."
+            f"[AI] Sending request to {MODEL_NAME}"
+        )
+
+        config = types.GenerateContentConfig(
+            system_instruction=SYSTEM_INSTRUCTION,
+            thinking_config=types.ThinkingConfig(
+                thinking_level="low"
+            ),
+            max_output_tokens=700,
+        )
+
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=message,
+            config=config,
+        )
+
+        answer = getattr(
+            response,
+            "text",
+            None
+        )
+
+        if answer:
+
+            answer = str(answer).strip()
+
+            print("[AI] Gemini response received.")
+
+            return answer
+
+
+        print("[AI] Gemini returned an empty response.")
+
+        return (
+            "AI તરફથી ખાલી જવાબ મળ્યો. "
+            "કૃપા કરીને ફરી પ્રયાસ કરો."
+        )
+
+
+    except Exception as e:
+
+        print(
+            "[AI] GEMINI ERROR: "
+            f"{type(e).__name__}: {e}"
         )
 
         standard = _standard_response(message)
@@ -370,124 +302,6 @@ def reply(
             return standard
 
         return (
-            "હાલમાં AI સેવા ઉપલબ્ધ નથી. "
+            "હાલમાં AI સલાહકારનો જવાબ મળ્યો નથી. "
             "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
         )
-
-    # --------------------------------------------------------
-    # Get Models
-    # --------------------------------------------------------
-
-    models_to_try = _get_models_to_try()
-
-    if not models_to_try:
-
-        print("No Gemini models are available.")
-
-        return (
-            "હાલમાં AI મોડેલ ઉપલબ્ધ નથી. "
-            "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
-        )
-
-    print(
-        "Gemini models to try:",
-        models_to_try
-    )
-
-    # --------------------------------------------------------
-    # Gemini Generation
-    # --------------------------------------------------------
-
-    for model_name in models_to_try:
-
-        try:
-
-            # ----------------------------------------------
-            # Generate content configuration
-            # ----------------------------------------------
-
-            if types is not None:
-
-                config = types.GenerateContentConfig(
-                    system_instruction=SYSTEM_INSTRUCTION,
-                    temperature=0.4,
-                    max_output_tokens=700,
-                )
-
-            else:
-
-                config = None
-
-            # ----------------------------------------------
-            # Generate response
-            # ----------------------------------------------
-
-            if config is not None:
-
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=message,
-                    config=config,
-                )
-
-            else:
-
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=message,
-                )
-
-            # ----------------------------------------------
-            # Extract response text
-            # ----------------------------------------------
-
-            answer = _extract_text(response)
-
-            if answer:
-
-                _LAST_WORKING_MODEL = model_name
-
-                print(
-                    f"Gemini response successful using: "
-                    f"{model_name}"
-                )
-
-                return answer
-
-            print(
-                f"Gemini returned empty response: "
-                f"{model_name}"
-            )
-
-        except Exception as e:
-
-            # IMPORTANT:
-            # Do not crash FastAPI.
-            # Log the actual Gemini error so it can be
-            # diagnosed from Vercel Runtime Logs.
-
-            print(
-                f"Gemini model failed [{model_name}]: "
-                f"{type(e).__name__}: {e}"
-            )
-
-            continue
-
-    # --------------------------------------------------------
-    # AI Failed -> Offline Fallback
-    # --------------------------------------------------------
-
-    print(
-        "All Gemini models failed. "
-        "Using offline fallback."
-    )
-
-    standard = _standard_response(message)
-
-    if standard:
-        return standard
-
-    return (
-        "હાલમાં AI સલાહકારનો જવાબ મળ્યો નથી. "
-        "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
-    )
