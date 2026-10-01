@@ -4,8 +4,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Base Directory Setup
-BASE = Path(__file__).resolve().parent.parent
-PUBLIC_DIR = os.path.join(BASE, "public")
+BASE = Path(__file__).resolve().parent
+PROJECT_ROOT = BASE.parent
+PUBLIC_DIR = os.path.join(PROJECT_ROOT, "public")
 
 load_dotenv(BASE / ".env")
 load_dotenv()
