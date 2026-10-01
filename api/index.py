@@ -26,7 +26,12 @@ model_harvest = joblib.load(os.path.join(BASE, "harvest_model.pkl"))
 
 # Load Summary Statistics
 summary_path = os.path.join(PUBLIC_DIR, "summary_stats.json")
-summary = json.load(open(summary_path, "r", encoding="utf-8")) if os.path.exists(summary_path) else {}
+
+if not os.path.exists(summary_path):
+    raise FileNotFoundError(f"summary_stats.json not found at: {summary_path}")
+
+with open(summary_path, "r", encoding="utf-8") as f:
+    summary = json.load(f)
 
 # Load District Dataset
 districts_path = os.path.join(PUBLIC_DIR, "districts.json")
