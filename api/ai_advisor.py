@@ -13,16 +13,12 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent
 
+# Load .env locally if available.
+# On Vercel, GEMINI_API_KEY should come from Environment Variables.
 load_dotenv(BASE_DIR / ".env")
 load_dotenv(BASE_DIR.parent / ".env")
 
-
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-
-try:
-    ...
-except Exception:
-    continue
 
 
 # ============================================================
@@ -32,36 +28,46 @@ except Exception:
 try:
     from google import genai
     from google.genai import types
-except ImportError:
+except ImportError as e:
+    print(f"Gemini SDK import failed: {type(e).__name__}: {e}")
     genai = None
     types = None
 
 
 client = None
 
-if GEMINI_API_KEY and genai is not None:
+if not GEMINI_API_KEY:
+    print("GEMINI_API_KEY is not configured.")
+
+elif genai is None:
+    print("Gemini SDK is not available.")
+
+else:
     try:
         client = genai.Client(
             api_key=GEMINI_API_KEY
         )
+
+        print("Gemini client initialized successfully.")
+
+    except Exception as e:
+        print(
+            "Gemini client initialization failed: "
+            f"{type(e).__name__}: {e}"
+        )
+        client = None
 
 
 # ============================================================
 # MODEL FALLBACKS
 # ============================================================
 
-# Current preferred model first, followed by older models
-# that may still be available to a particular API project.
-#
-# The code also discovers available models dynamically below.
+# Try the preferred model first.
+# Older models are kept only as fallbacks.
 MODEL_FALLBACKS = [
     "gemini-3.8-flash",
     "gemini-2.5-flash",
     "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
-    "gemini-1.5-pro",
 ]
 
 
@@ -73,6 +79,7 @@ _LAST_WORKING_MODEL: str | None = None
 # ============================================================
 
 STANDARD_RESPONSES = {
+
     "કચ્છ": (
         "કચ્છ જેવા શુષ્ક વિસ્તારમાં વરસાદી પાણીનો સંગ્રહ, "
         "છત પરથી રેઇનવોટર હાર્વેસ્ટિંગ અને ભૂગર્ભજળ રિચાર્જ "
@@ -87,7 +94,8 @@ STANDARD_RESPONSES = {
 
     "એલ નીનો": (
         "એલ નીનોની સ્થિતિમાં વરસાદ ઓછો રહેવાની શક્યતા હોય ત્યારે "
-        "વરસાદી પાણીનો સંગ્રહ અને પાણીનો કાર્યક્ષમ ઉપયોગ વધુ મહત્વનો બને છે."
+        "વરસાદી પાણીનો સંગ્રહ અને પાણીનો કાર્યક્ષમ ઉપયોગ વધુ "
+        "મહત્વનો બને છે."
     ),
 
     "બચાવવાના ઉપાયો": (
@@ -139,9 +147,15 @@ SYSTEM_INSTRUCTION = """
 # ============================================================
 
 def _standard_response(message: str) -> str | None:
+    """
+    Return a predefined Gujarati response when the
+    question matches one of the offline keywords.
+    """
+
     text = message.lower()
 
     for keyword, response in STANDARD_RESPONSES.items():
+
         if keyword.lower() in text:
             return response
 
@@ -149,6 +163,10 @@ def _standard_response(message: str) -> str | None:
 
 
 def _is_greeting(message: str) -> bool:
+    """
+    Detect common greetings.
+    """
+
     greetings = (
         "નમસ્તે",
         "હેલો",
@@ -170,12 +188,13 @@ def _is_greeting(message: str) -> bool:
 def _get_models_to_try() -> list[str]:
     """
     Build a model list from:
+
     1. Last successful model
     2. Preferred fallback models
     3. Models currently exposed by the Gemini API
 
-    This prevents deployment from depending entirely on one
-    model name that may later become unavailable.
+    This allows the application to continue working if a
+    particular model is unavailable to the API project.
     """
 
     models: list[str] = []
@@ -187,15 +206,21 @@ def _get_models_to_try() -> list[str]:
         if model_name not in models:
             models.append(model_name)
 
+    # Last successful model first.
     if _LAST_WORKING_MODEL:
         add(_LAST_WORKING_MODEL)
 
+    # Preferred fallback models.
     for model_name in MODEL_FALLBACKS:
         add(model_name)
 
+    # Discover currently available Gemini models.
     if client is not None:
+
         try:
+
             for model in client.models.list():
+
                 name = getattr(
                     model,
                     "name",
@@ -205,18 +230,16 @@ def _get_models_to_try() -> list[str]:
                 if not name:
                     continue
 
-                # The API can return names like:
-                # models/gemini-...
                 clean_name = str(name)
 
                 if clean_name.startswith("models/"):
                     clean_name = clean_name[
-                        len("models/") :
+                        len("models/"):
                     ]
 
                 lowered = clean_name.lower()
 
-                # Only consider Gemini generative text models.
+                # Only consider Gemini text/generative models.
                 if (
                     "gemini" in lowered
                     and "embedding" not in lowered
@@ -225,14 +248,23 @@ def _get_models_to_try() -> list[str]:
                 ):
                     add(clean_name)
 
-        except Exception:
-            pass
+        except Exception as e:
+
+            print(
+                "Gemini model discovery failed: "
+                f"{type(e).__name__}: {e}"
+            )
 
     return models
 
 
 def _extract_text(response: Any) -> str:
+    """
+    Safely extract generated text from a Gemini response.
+    """
+
     try:
+
         text = getattr(
             response,
             "text",
@@ -241,8 +273,13 @@ def _extract_text(response: Any) -> str:
 
         if text:
             return str(text).strip()
-    except Exception:
-        pass
+
+    except Exception as e:
+
+        print(
+            "Gemini response text extraction failed: "
+            f"{type(e).__name__}: {e}"
+        )
 
     return ""
 
@@ -260,16 +297,23 @@ def reply(
 
     message = str(message or "").strip()
 
+    # --------------------------------------------------------
+    # Empty message
+    # --------------------------------------------------------
+
     if not message:
         return "કૃપા કરીને તમારો પ્રશ્ન લખો."
 
-    mode = str(mode or "standard").lower()
+    mode = str(
+        mode or "standard"
+    ).lower().strip()
 
     # --------------------------------------------------------
     # Greeting
     # --------------------------------------------------------
 
     if _is_greeting(message):
+
         return (
             "નમસ્તે! 💧 "
             "જળ સંચય, વરસાદી પાણી, ભૂગર્ભજળ અથવા "
@@ -277,10 +321,11 @@ def reply(
         )
 
     # --------------------------------------------------------
-    # Standard / offline mode
+    # Standard / Offline Mode
     # --------------------------------------------------------
 
     if mode != "deep":
+
         standard = _standard_response(message)
 
         if standard:
@@ -294,10 +339,31 @@ def reply(
         )
 
     # --------------------------------------------------------
-    # Deep AI mode without API key
+    # Deep AI Mode — API Key / Client Check
     # --------------------------------------------------------
 
+    if not GEMINI_API_KEY:
+
+        print(
+            "Deep AI requested, but GEMINI_API_KEY is missing."
+        )
+
+        standard = _standard_response(message)
+
+        if standard:
+            return standard
+
+        return (
+            "હાલમાં AI સેવા ઉપલબ્ધ નથી. "
+            "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
+        )
+
     if client is None:
+
+        print(
+            "Deep AI requested, but Gemini client is unavailable."
+        )
+
         standard = _standard_response(message)
 
         if standard:
@@ -309,47 +375,112 @@ def reply(
         )
 
     # --------------------------------------------------------
-    # Gemini
+    # Get Models
     # --------------------------------------------------------
 
     models_to_try = _get_models_to_try()
 
+    if not models_to_try:
+
+        print("No Gemini models are available.")
+
+        return (
+            "હાલમાં AI મોડેલ ઉપલબ્ધ નથી. "
+            "કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો."
+        )
+
+    print(
+        "Gemini models to try:",
+        models_to_try
+    )
+
+    # --------------------------------------------------------
+    # Gemini Generation
+    # --------------------------------------------------------
+
     for model_name in models_to_try:
 
         try:
+
+            # ----------------------------------------------
+            # Generate content configuration
+            # ----------------------------------------------
+
             if types is not None:
+
                 config = types.GenerateContentConfig(
                     system_instruction=SYSTEM_INSTRUCTION,
                     temperature=0.4,
                     max_output_tokens=700,
                 )
+
             else:
+
                 config = None
 
+            # ----------------------------------------------
+            # Generate response
+            # ----------------------------------------------
+
             if config is not None:
+
                 response = client.models.generate_content(
                     model=model_name,
                     contents=message,
                     config=config,
                 )
+
             else:
+
                 response = client.models.generate_content(
                     model=model_name,
                     contents=message,
                 )
 
+            # ----------------------------------------------
+            # Extract response text
+            # ----------------------------------------------
+
             answer = _extract_text(response)
 
             if answer:
+
                 _LAST_WORKING_MODEL = model_name
+
+                print(
+                    f"Gemini response successful using: "
+                    f"{model_name}"
+                )
+
                 return answer
 
-        except Exception:
+            print(
+                f"Gemini returned empty response: "
+                f"{model_name}"
+            )
+
+        except Exception as e:
+
+            # IMPORTANT:
+            # Do not crash FastAPI.
+            # Log the actual Gemini error so it can be
+            # diagnosed from Vercel Runtime Logs.
+
+            print(
+                f"Gemini model failed [{model_name}]: "
+                f"{type(e).__name__}: {e}"
+            )
+
             continue
 
     # --------------------------------------------------------
-    # AI failed -> offline fallback
+    # AI Failed -> Offline Fallback
     # --------------------------------------------------------
+
+    print(
+        "All Gemini models failed. "
+        "Using offline fallback."
+    )
 
     standard = _standard_response(message)
 
