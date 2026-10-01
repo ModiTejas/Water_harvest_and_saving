@@ -39,8 +39,6 @@ if GEMINI_API_KEY and genai is not None:
         client = genai.Client(
             api_key=GEMINI_API_KEY
         )
-    except Exception:
-        client = None
 
 
 # ============================================================
