@@ -19,6 +19,11 @@ load_dotenv(BASE_DIR.parent / ".env")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 
+try:
+    ...
+except Exception:
+    continue
+
 
 # ============================================================
 # GEMINI SDK
