@@ -106,6 +106,23 @@ const EFFECTS = {
   // Change this number to adjust the default grass movement speed.
   GRASS_WIND_SPEED: 1.85
 };
+const RAIN_CONFIG = {
+
+  // RAIN PATTERN:
+  // "automatic" = rain speed and opacity change naturally with time.
+  // "custom"   = you control the rain speed and opacity manually.
+  RAIN_PATTERN: "automatic",
+
+  // CUSTOM RAIN OPACITY:
+  // Used only when RAIN_PATTERN is "custom".
+  // 0.30 = subtle, 0.42 = medium, 0.55 = more visible.
+  RAIN_OPACITY: 0.42,
+
+  // CUSTOM RAIN SPEED:
+  // Used only when RAIN_PATTERN is "custom".
+  // 0.85 = slow, 1.00 = natural, 1.15 = slightly faster.
+  RAIN_SPEED: 1.00
+};
 </script>
 <!-- ================================================================
      VISUAL EFFECT SETTINGS — END
@@ -1186,7 +1203,10 @@ addTips();
      ================================================================ -->
 <script>
 (function initRainEffect(){
+
   if (typeof EFFECTS === 'undefined' || EFFECTS.RAIN !== true) return;
+  if (typeof RAIN_CONFIG === 'undefined') return;
+
   const style=document.createElement('style');
   style.id='rain-effect-style';
   style.textContent=`
@@ -1196,9 +1216,11 @@ addTips();
       width:100vw;
       height:100vh;
       pointer-events:none;
+
       /* RAIN STAYS BEHIND THE CLOUD LAYER */
       z-index:1;
-      opacity:.30;
+
+      opacity:1;
     }
   `;
   document.head.appendChild(style);
@@ -1212,68 +1234,204 @@ addTips();
   if(!ctx) return;
 
   let w=0,h=0,dpr=1;
+
   const layers=[
     {n:32,sp:[2.5,4],len:[8,14],op:.13},
     {n:28,sp:[4,6],len:[12,18],op:.22},
     {n:22,sp:[6,8.5],len:[16,24],op:.34}
   ];
+
   const drops=[];
 
+  /*
+   * Current rain values.
+   */
+  let currentSpeed=1.0;
+  let currentOpacity=0.42;
+
+  /*
+   * Target values used by automatic mode.
+   */
+  let targetSpeed=1.0;
+  let targetOpacity=0.42;
+
+  /*
+   * CUSTOM MODE
+   *
+   * Use the values from RAIN_CONFIG.
+   */
+  if(String(RAIN_CONFIG.RAIN_PATTERN).toLowerCase()==='custom'){
+
+    currentSpeed=Number(RAIN_CONFIG.RAIN_SPEED);
+    targetSpeed=currentSpeed;
+
+    currentOpacity=Number(RAIN_CONFIG.RAIN_OPACITY);
+    targetOpacity=currentOpacity;
+  }
+
+  /*
+   * AUTOMATIC MODE
+   *
+   * Rain gradually changes between:
+   *
+   * Medium:
+   * speed   = 1.00
+   * opacity = 0.42
+   *
+   * Slow:
+   * speed   = 0.78
+   * opacity = 0.32
+   *
+   * No very fast/storm-like rain.
+   */
+  function chooseAutomaticWeather(){
+
+    if(Math.random()<0.5){
+
+      targetSpeed=1.00;
+      targetOpacity=0.42;
+
+    }else{
+
+      targetSpeed=0.78;
+      targetOpacity=0.32;
+    }
+
+    /*
+     * Stay at each weather level for
+     * approximately 45–90 seconds.
+     */
+    const nextChange=
+      45000+
+      Math.random()*45000;
+
+    setTimeout(chooseAutomaticWeather,nextChange);
+  }
+
+  if(String(RAIN_CONFIG.RAIN_PATTERN).toLowerCase()==='automatic'){
+    chooseAutomaticWeather();
+  }
+
   function resize(){
+
     dpr=Math.min(window.devicePixelRatio||1,2);
+
     w=window.innerWidth;
     h=window.innerHeight;
+
     canvas.width=Math.floor(w*dpr);
     canvas.height=Math.floor(h*dpr);
+
     canvas.style.width=w+'px';
     canvas.style.height=h+'px';
+
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
 
   addEventListener('resize',resize,{passive:true});
+
   resize();
 
   layers.forEach(layer=>{
+
     for(let i=0;i<layer.n;i++){
+
       drops.push({
+
         x:Math.random()*w,
-        // Most drops begin in the upper sky so they visually emerge from the cloud band.
-        y:Math.random() < .72 ? Math.random()*Math.min(h,w*0.42) : Math.random()*h,
-        s:layer.sp[0]+Math.random()*(layer.sp[1]-layer.sp[0]),
-        len:layer.len[0]+Math.random()*(layer.len[1]-layer.len[0]),
+
+        /*
+         * Most drops begin in the upper sky
+         * so they visually emerge from the cloud band.
+         */
+        y:
+          Math.random()<.72
+            ? Math.random()*Math.min(h,w*0.42)
+            : Math.random()*h,
+
+        s:
+          layer.sp[0]+
+          Math.random()*(layer.sp[1]-layer.sp[0]),
+
+        len:
+          layer.len[0]+
+          Math.random()*(layer.len[1]-layer.len[0]),
+
         o:layer.op
       });
     }
   });
 
   function draw(){
+
     ctx.clearRect(0,0,w,h);
+
+    /*
+     * Smoothly move toward the automatic
+     * target values.
+     *
+     * This prevents sudden changes.
+     */
+    currentSpeed+=
+      (targetSpeed-currentSpeed)*0.008;
+
+    currentOpacity+=
+      (targetOpacity-currentOpacity)*0.008;
+
     ctx.strokeStyle='#00e5ff';
     ctx.lineWidth=1.05;
     ctx.lineCap='round';
 
     for(const d of drops){
-      ctx.globalAlpha=d.o;
+
+      /*
+       * Scale the existing layer opacity
+       * according to the selected rain opacity.
+       *
+       * 0.42 is the normal reference level.
+       */
+      ctx.globalAlpha=
+        d.o*(currentOpacity/0.42);
+
       ctx.beginPath();
+
       ctx.moveTo(d.x,d.y);
-      ctx.lineTo(d.x-2,d.y+d.len);
+
+      ctx.lineTo(
+        d.x-2,
+        d.y+d.len
+      );
+
       ctx.stroke();
 
-      d.y+=d.s;
+      /*
+       * Apply the selected rain speed.
+       */
+      d.y+=d.s*currentSpeed;
+
+      /*
+       * Existing slight diagonal movement.
+       */
       d.x-=.4;
 
       if(d.y>h+20){
+
         d.y=-25;
         d.x=Math.random()*w;
       }
-      if(d.x<-30)d.x=w+20;
+
+      if(d.x<-30){
+        d.x=w+20;
+      }
     }
 
     ctx.globalAlpha=1;
+
     requestAnimationFrame(draw);
   }
 
   draw();
+
 })();
 </script>
 <!-- ================================================================
