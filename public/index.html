@@ -168,23 +168,16 @@ const RAIN_CONFIG = {
   <div class="sim-example" id="viewNote" style="margin-bottom:16px"></div>
   <div class="cards" id="zoneCards"></div>
 
-  <h2 class="section-title" id="rain">માસિક વરસાદ વિરુદ્ધ વેડફાતું પાણી</h2>
-  <div class="btn-group">
-    <div class="zone-btns" id="zoneBtns">
-      <button class="btn active" id="btnArid" onclick="setZone('Arid',this)">શુષ્ક (કચ્છ/ઉત્તર)</button>
-      <button class="btn" id="btnSemiArid" onclick="setZone('Semi-Arid',this)">અર્ધ-શુષ્ક (મધ્ય/સૌરાષ્ટ્ર)</button>
-      <button class="btn" id="btnCoastal" onclick="setZone('Coastal',this)">દરિયાકાંઠો (દક્ષિણ)</button>
-    </div>
-    <button class="btn elnino" id="elninoBtn" onclick="toggleElnino(this)">🌡️ એલ નીનો ૨૦૨૬ અસર</button>
-  </div>
-  <div class="chart-box"><div class="chart-container"><canvas id="mainChart" style="width:100%;height:100%"></canvas></div></div>
-
-  <h2 class="section-title" id="gwl">ભૂગર્ભ જળસ્તરની સ્થિતિ</h2>
-  <div class="chart-box"><div class="chart-container"><canvas id="gwlChart" style="width:100%;height:100%"></canvas></div></div>
-
-  <h2 class="section-title">ભૂગર્ભ જળસ્તરનો વાર્ષિક ટ્રેન્ડ (૨૦૨૨–૨૦૨૭ ડેટા)</h2>
-  <div class="chart-box"><div class="chart-container"><canvas id="trendChart" style="width:100%;height:100%"></canvas></div></div>
-
+  <!-- ================================================================
+       SECTION: CHOMASU VARASADI PANI SANCHAY CALCULATOR
+       Includes:
+       - Section title
+       - Calculator inputs
+       - Calculation button
+       - Mass-balance explanation
+       - Calculation result
+       - BIS reference
+       ================================================================ -->
   <h2 class="section-title" id="calc">ચોમાસાનું વરસાદી પાણી સંચય કેલ્ક્યુલેટર</h2>
   <div class="simulator">
     <div class="sim-grid">
@@ -220,6 +213,28 @@ const RAIN_CONFIG = {
       <a href="https://standards.bis.gov.in/website/standard-details?encryptedId=eyJpdiI6IjQ0MXdlWnFFSWg0NGNjd2ZqRXNUM1E9PSIsInZhbHVlIjoiVnFsNnJaMWdyVDB4MnhwTnl4MGJFQT09IiwibWFjIjoiYzVjNzExZWY5MjE1MmEyZjBjZWJhZTEyOTYxZDgyOTFlZTkzYTAzOGE5NTEwODdlNmMyMzNmZTZiYTExZTM0YiIsInRhZyI6IiJ9" target="_blank" rel="noopener noreferrer">IS 15797:2008 — BIS Official Standard Reference ↗</a>
     </div>
   </div>
+
+  <!-- ================================================================
+       END SECTION: CHOMASU VARASADI PANI SANCHAY CALCULATOR
+       ================================================================ -->
+
+
+  <h2 class="section-title" id="rain">માસિક વરસાદ વિરુદ્ધ વેડફાતું પાણી</h2>
+  <div class="btn-group">
+    <div class="zone-btns" id="zoneBtns">
+      <button class="btn active" id="btnArid" onclick="setZone('Arid',this)">શુષ્ક (કચ્છ/ઉત્તર)</button>
+      <button class="btn" id="btnSemiArid" onclick="setZone('Semi-Arid',this)">અર્ધ-શુષ્ક (મધ્ય/સૌરાષ્ટ્ર)</button>
+      <button class="btn" id="btnCoastal" onclick="setZone('Coastal',this)">દરિયાકાંઠો (દક્ષિણ)</button>
+    </div>
+    <button class="btn elnino" id="elninoBtn" onclick="toggleElnino(this)">🌡️ એલ નીનો ૨૦૨૬ અસર</button>
+  </div>
+  <div class="chart-box"><div class="chart-container"><canvas id="mainChart" style="width:100%;height:100%"></canvas></div></div>
+
+  <h2 class="section-title" id="gwl">ભૂગર્ભ જળસ્તરની સ્થિતિ</h2>
+  <div class="chart-box"><div class="chart-container"><canvas id="gwlChart" style="width:100%;height:100%"></canvas></div></div>
+
+  <h2 class="section-title">ભૂગર્ભ જળસ્તરનો વાર્ષિક ટ્રેન્ડ (૨૦૨૨–૨૦૨૭ ડેટા)</h2>
+  <div class="chart-box"><div class="chart-container"><canvas id="trendChart" style="width:100%;height:100%"></canvas></div></div>
 
   <h2 class="section-title" id="policy">સૂચનો</h2>
   <div class="policy-grid">
